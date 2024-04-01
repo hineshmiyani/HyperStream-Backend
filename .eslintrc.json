@@ -1,0 +1,58 @@
+{
+  "root": true, // Indicates that this is the root configuration file, ESLint won't look for configuration files in parent directories
+  "parser": "@typescript-eslint/parser", // Specifies the parser to be used for TypeScript files
+  "parserOptions": {
+    "ecmaVersion": 12, // Specifies the version of ECMAScript syntax you want to use
+    "sourceType": "module", // Indicates that the code is in ECMAScript modules
+    "project": "./tsconfig.json" // Path to the tsconfig.json file
+  },
+  "extends": [
+    "eslint:recommended", // Extends the set of rules recommended by ESLint
+    "plugin:@typescript-eslint/recommended", // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    "plugin:import/errors", // Enables import plugin to check for import errors
+    "plugin:import/warnings", // Enables import plugin to check for import warnings
+    "plugin:prettier/recommended", // Enables prettier plugin as a recommended configuration, also disables ESLint rules that might conflict with Prettier
+    "prettier" // Extends Prettier configuration
+  ],
+  "env": {
+    "es2021": true, // Enables ES2021 syntax support
+    "node": true // Enables Node.js global variables and Node.js scoping
+  },
+  "plugins": ["@typescript-eslint", "import"], // Specifies ESLint plugins
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "warn", // Warns against using the `any` type
+    "@typescript-eslint/explicit-function-return-type": "warn", // Warns if a function's return type is not explicitly declared
+    "@typescript-eslint/no-unused-vars": "warn", // Warns on variables declared but not used
+    "@typescript-eslint/no-non-null-assertion": "error", // Disallows non-null assertions using the `!` postfix operator
+    "eqeqeq": "error", // Requires the use of `===` and `!==` instead of `==` and `!=`
+    "no-console": "warn", // Warns on console usage
+    "no-constant-condition": "error", // Disallows constant expressions in conditions
+    "curly": "error", // Requires curly braces for all control statements
+    "no-eval": "error", // Disallows the use of `eval()`
+    "no-implied-eval": "error", // Disallows the use of implied `eval()` through the `setTimeout()`, `setInterval()` and `execScript()` functions
+    "no-redeclare": "error", // Disallows variable re-declaration
+    "indent": ["error", 2], // Enforces a consistent indentation of 2 spaces
+    "quotes": ["error", "single"], // Requires the use of single quotes
+    "semi": "off", // Requires semicolons at the end of statements
+    "callback-return": "warn", // Requires return statements after callbacks
+    "handle-callback-err": "error", // Requires error handling in callbacks
+    "no-path-concat": "error", // Disallows string concatenation with `__dirname` and `__filename`
+    "no-unused-vars": [
+      "warn",
+      { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }
+    ], // Warns on unused variables with specific configurations
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"], // Specifies the order of import statements
+        "newlines-between": "always" // Requires or disallows new lines between import groups
+      }
+    ],
+    "import/newline-after-import": "error" // Requires a newline after the last import statement
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  }
+}
