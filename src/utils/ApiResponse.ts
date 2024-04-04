@@ -2,18 +2,18 @@ import { HttpStatusCodes } from '@/constants/httpStatusCodes'
 
 class ApiResponse<T> {
   statusCode: number
-  data: T
+  data: T | object
   message: string
   success: boolean
 
   constructor({
     statusCode = HttpStatusCodes.OK,
-    data,
+    data = {},
     message = 'Success',
     success = statusCode < 400,
   }: {
     statusCode?: number
-    data: T
+    data?: T | object
     message?: string
     success?: boolean
   }) {
