@@ -37,6 +37,7 @@ const errorHandler = (
     },
     success: false,
     ...(process.env.NODE_ENV?.includes('dev') ? { stack: (error as Error)?.stack } : {}),
+    isOperationalError: false,
   })
 }
 

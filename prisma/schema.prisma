@@ -15,13 +15,24 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  username     String   @unique
-  email        String   @unique
-  password     String
-  avatar       String?  @db.Text
-  coverImage   String?  @db.Text
-  refreshToken String?  @db.Text
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String         @id @default(uuid())
+  username        String         @unique
+  email           String         @unique
+  displayName     String?
+  password        String?
+  avatar          String?        @db.Text
+  coverImage      String?        @db.Text
+  refreshToken    String?        @db.Text
+  googleId        String?        @unique
+  facebookId      String?        @unique
+  authProviders   AuthProvider[]
+  isEmailVerified Boolean?       @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+enum AuthProvider {
+  GOOGLE
+  FACEBOOK
+  JWT
 }

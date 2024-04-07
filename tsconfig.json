@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["es2018", "dom"], // Specify a list of libraries the project will use
-    "target": "es2018", // Set the JavaScript version for output files
+    "lib": ["es2021", "dom"], // Specify a list of libraries the project will use
+    "target": "es2021", // Set the JavaScript version for output files
     "module": "commonjs", // Set the module system (Node.js uses CommonJS)
     "strict": true, // Enable all strict type-checking options
     "outDir": "dist", // Redirect output structure to the 'dist' folder
