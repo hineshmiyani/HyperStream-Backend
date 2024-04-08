@@ -1,15 +1,14 @@
-import { AuthProvider, PrismaClient, User } from '@prisma/client'
+import { AuthProvider, User } from '@prisma/client'
+import { NextFunction, Request, Response } from 'express'
 import passport from 'passport'
-import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt'
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { Strategy as FacebookStrategy } from 'passport-facebook'
-import { Request, Response, NextFunction } from 'express'
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
+import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
 
+import { prisma } from '@/db/prisma'
 import ENV from '@/env'
 import { asyncHandler } from '@/utils/asyncHandler'
 import { ApiError } from '@/utils/errorHandling/ApiError'
-
-const prisma = new PrismaClient()
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

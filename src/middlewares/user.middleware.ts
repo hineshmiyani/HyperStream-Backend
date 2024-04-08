@@ -1,17 +1,15 @@
 import { NextFunction, Request, Response } from 'express'
 import { fromZodError } from 'zod-validation-error'
-import { PrismaClient } from '@prisma/client'
 
+import { prisma } from '@/db/prisma'
 import { asyncHandler } from '@/utils/asyncHandler'
+import { ApiError } from '@/utils/errorHandling/ApiError'
 import {
   baseUserSchema,
   loginUserSchema,
   registerUserSchema,
   resetPasswordSchema,
 } from '@/validators/user.schema'
-import { ApiError } from '@/utils/errorHandling/ApiError'
-
-const prisma = new PrismaClient()
 
 const isUserExist = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
   const { username, email } = req.body

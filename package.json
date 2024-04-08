@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register -r dotenv/config ./src/app.ts",
+    "start": "ts-node -r tsconfig-paths/register -r dotenv/config ./src/index.ts",
     "dev": "nodemon",
     "build": "tsc",
     "format:check": "prettier --ignore-path .gitignore --check \"src/**/*.{js,mjs,cjs,ts,json}\"",

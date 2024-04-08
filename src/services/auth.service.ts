@@ -1,7 +1,8 @@
-import { PrismaClient, User } from '@prisma/client'
+import { User } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
+import { prisma } from '@/db/prisma'
 import ENV from '@/env'
 import {
   generateResetPasswordEmail,
@@ -9,8 +10,6 @@ import {
   sendEmail,
 } from '@/services/nodemailer.service'
 import { ApiError } from '@/utils/errorHandling/ApiError'
-
-const prisma = new PrismaClient()
 
 const generateHashedPassword = async (password: string, saltOrRounds = 10): Promise<string> => {
   return await bcrypt.hash(password, saltOrRounds)

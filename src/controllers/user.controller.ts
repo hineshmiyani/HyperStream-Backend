@@ -1,11 +1,10 @@
+import { AuthProvider, User } from '@prisma/client'
 import { Request, Response } from 'express'
-import { AuthProvider, PrismaClient, User } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 
-import { asyncHandler } from '@/utils/asyncHandler'
-import { ApiResponse } from '@/utils/ApiResponse'
 import { HttpStatusCodes } from '@/constants/httpStatusCodes'
-import { ApiError } from '@/utils/errorHandling/ApiError'
+import { prisma } from '@/db/prisma'
+import ENV from '@/env'
 import {
   generateAccessAndRefreshTokens,
   generateHashedPassword,
@@ -14,9 +13,9 @@ import {
   sendVerificationEmail,
   verifyToken,
 } from '@/services/auth.service'
-import ENV from '@/env'
-
-const prisma = new PrismaClient()
+import { ApiResponse } from '@/utils/ApiResponse'
+import { asyncHandler } from '@/utils/asyncHandler'
+import { ApiError } from '@/utils/errorHandling/ApiError'
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, email, password } = req.body
