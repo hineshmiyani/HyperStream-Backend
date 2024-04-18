@@ -7,8 +7,8 @@ import { ApiError } from '@/utils/errorHandling/ApiError'
 import {
   baseUserSchema,
   loginUserSchema,
-  registerUserSchema,
   resetPasswordSchema,
+  signUpUserSchema,
 } from '@/validators/user.schema'
 
 const isUserExist = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
@@ -44,22 +44,20 @@ const isUserEmailVerified = asyncHandler(
   }
 )
 
-const validateRegisterUserData = asyncHandler(
-  (req: Request, _res: Response, next: NextFunction) => {
-    const { username, email, password } = req.body
+const validateSignUpUserData = asyncHandler((req: Request, _res: Response, next: NextFunction) => {
+  const { username, email, password } = req.body
 
-    const payload = registerUserSchema.safeParse({ username, email, password })
+  const payload = signUpUserSchema.safeParse({ username, email, password })
 
-    if (!payload?.success) {
-      const errorMessage = fromZodError(payload?.error)?.message
-      throw ApiError.Api400Error({ message: errorMessage })
-    }
-
-    req.body = payload?.data
-
-    next()
+  if (!payload?.success) {
+    const errorMessage = fromZodError(payload?.error)?.message
+    throw ApiError.Api400Error({ message: errorMessage })
   }
-)
+
+  req.body = payload?.data
+
+  next()
+})
 
 const validateLoginUserData = asyncHandler((req: Request, _res: Response, next: NextFunction) => {
   const { username, email, password } = req.body
@@ -112,10 +110,10 @@ const validateResetPasswordData = asyncHandler(
 )
 
 export {
-  isUserExist,
   isUserEmailVerified,
-  validateRegisterUserData,
+  isUserExist,
   validateLoginUserData,
-  validateUserEmail,
   validateResetPasswordData,
+  validateSignUpUserData,
+  validateUserEmail,
 }

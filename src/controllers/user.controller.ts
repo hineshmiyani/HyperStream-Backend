@@ -17,7 +17,7 @@ import { ApiResponse } from '@/utils/ApiResponse'
 import { asyncHandler } from '@/utils/asyncHandler'
 import { ApiError } from '@/utils/errorHandling/ApiError'
 
-const registerUser = asyncHandler(async (req: Request, res: Response) => {
+const signUpUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, email, password } = req.body
 
   const hashedPassword = await generateHashedPassword(password)
@@ -55,7 +55,6 @@ const verifyUserEmail = asyncHandler(async (req: Request, res: Response) => {
     data: { isEmailVerified: true },
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const { password: _password, refreshToken: _refreshToken, ...registeredUser } = updatedUser
 
   return res.status(HttpStatusCodes.OK).json(
@@ -140,19 +139,8 @@ const loginUserWithGoogleOrFacebook = asyncHandler(async (req: Request, res: Res
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user?.id)
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-  const { password: _password, refreshToken: _refreshToken, ...loggedInUser } = user || {}
-
-  return res.status(HttpStatusCodes.OK).json(
-    new ApiResponse({
-      statusCode: HttpStatusCodes.OK,
-      data: {
-        user: loggedInUser,
-        accessToken,
-        refreshToken,
-      },
-      message: 'User logged in successfully.',
-    })
+  return res.redirect(
+    `${ENV.FRONTEND_BASE_URL}/verify-email?accessToken=${accessToken}&refreshToken=${refreshToken}&socialLogin=true`
   )
 })
 
@@ -305,15 +293,15 @@ const resetPassword = asyncHandler(async (req: Request, res: Response) => {
 })
 
 export {
-  registerUser,
-  verifyUserEmail,
-  resendVerificationEmail,
+  changeCurrentPassword,
+  getCurrentUser,
   loginUser,
   loginUserWithGoogleOrFacebook,
   logoutUser,
   refreshAccessToken,
-  changeCurrentPassword,
-  getCurrentUser,
-  sendPasswordRecoveryEmail,
+  resendVerificationEmail,
   resetPassword,
+  sendPasswordRecoveryEmail,
+  signUpUser,
+  verifyUserEmail,
 }

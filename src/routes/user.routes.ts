@@ -7,32 +7,33 @@ import {
   loginUserWithGoogleOrFacebook,
   logoutUser,
   refreshAccessToken,
-  registerUser,
   resendVerificationEmail,
   resetPassword,
   sendPasswordRecoveryEmail,
+  signUpUser,
   verifyUserEmail,
 } from '@/controllers/user.controller'
+import ENV from '@/env'
 import { passport, verifyJWT } from '@/middlewares/auth.middleware'
 import {
   isUserExist,
   validateLoginUserData,
-  validateRegisterUserData,
   validateResetPasswordData,
+  validateSignUpUserData,
   validateUserEmail,
 } from '@/middlewares/user.middleware'
 
 const router = Router()
 
-router.post('/register', validateRegisterUserData, isUserExist, registerUser)
+router.post('/signup', validateSignUpUserData, isUserExist, signUpUser)
 router.post('/login', validateLoginUserData, loginUser)
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    // failureRedirect: '/login',  // Frontend failureRedirect route
-    // successRedirect: '/', // Frontend successRedirect route
+    failureRedirect: ENV.FRONTEND_BASE_URL, // Frontend failureRedirect route
+    // successRedirect: ENV.FRONTEND_BASE_URL, // Frontend successRedirect route
     session: false,
   }),
   loginUserWithGoogleOrFacebook
@@ -42,8 +43,8 @@ router.get('/facebook', passport.authenticate('facebook'))
 router.get(
   '/facebook/callback',
   passport.authenticate('facebook', {
-    // failureRedirect: '/login',  // Frontend failureRedirect route
-    // successRedirect: '/', // Frontend successRedirect route
+    failureRedirect: ENV.FRONTEND_BASE_URL, // Frontend failureRedirect route
+    // successRedirect: ENV.FRONTEND_BASE_URL, // Frontend successRedirect route
     session: false,
   }),
   loginUserWithGoogleOrFacebook
