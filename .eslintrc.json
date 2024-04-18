@@ -22,7 +22,7 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn", // Warns against using the `any` type
     "@typescript-eslint/explicit-function-return-type": "warn", // Warns if a function's return type is not explicitly declared
-    "@typescript-eslint/no-unused-vars": "warn", // Warns on variables declared but not used
+    "@typescript-eslint/no-unused-vars": ["warn", { "varsIgnorePattern": "^_" }], // Warns on variables declared but not used
     "@typescript-eslint/no-non-null-assertion": "error", // Disallows non-null assertions using the `!` postfix operator
     "eqeqeq": "error", // Requires the use of `===` and `!==` instead of `==` and `!=`
     "no-console": "warn", // Warns on console usage
@@ -37,10 +37,7 @@
     "callback-return": "warn", // Requires return statements after callbacks
     "handle-callback-err": "error", // Requires error handling in callbacks
     "no-path-concat": "error", // Disallows string concatenation with `__dirname` and `__filename`
-    "no-unused-vars": [
-      "warn",
-      { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }
-    ], // Warns on unused variables with specific configurations
+    "no-unused-vars": ["off", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }], // Warns on unused variables with specific configurations
     "import/order": [
       "error",
       {
