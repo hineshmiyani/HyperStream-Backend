@@ -20,13 +20,14 @@ model User {
   email           String         @unique
   displayName     String?
   password        String?
+  bio             String?        @db.Text
   avatar          String?        @db.Text
   coverImage      String?        @db.Text
   refreshToken    String?        @db.Text
   googleId        String?        @unique
   facebookId      String?        @unique
   authProviders   AuthProvider[]
-  isEmailVerified Boolean?       @default(false)
+  isEmailVerified Boolean        @default(false)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 }
