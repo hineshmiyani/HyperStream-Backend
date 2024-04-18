@@ -109,7 +109,7 @@ const generateVerificationEmail = (verificationLink: string): string => {
       <div class="container">
         <div class="logo">
           <img
-            src="https://example.com/hyperstream-logo.png"
+            src="https://i.imgur.com/v1vDlH4.png"
             alt="HyperStream Logo"
           />
         </div>
@@ -202,7 +202,7 @@ const generateResetPasswordEmail = (resetPasswordLink: string): string => {
       <div class="container">
         <div class="logo">
           <img
-            src="https://example.com/hyperstream-logo.png"
+            src="https://i.imgur.com/v1vDlH4.png"
             alt="HyperStream Logo"
           />
         </div>
