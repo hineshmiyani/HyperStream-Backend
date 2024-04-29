@@ -118,7 +118,6 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user?.id)
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const { password: _password, refreshToken: _refreshToken, ...loggedInUser } = user
 
   return res.status(HttpStatusCodes.OK).json(
@@ -292,6 +291,23 @@ const resetPassword = asyncHandler(async (req: Request, res: Response) => {
     .json(new ApiResponse({ message: 'Password reset successfully.' }))
 })
 
+const updateAccountDetails = asyncHandler(async (req: Request, res: Response) => {
+  const body = req.body
+
+  const userId = (req.user as User)?.id
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: body,
+  })
+
+  const { password: _password, refreshToken: _refreshToken, ...updatedUser } = user
+
+  return res
+    .status(HttpStatusCodes.OK)
+    .json(new ApiResponse({ data: updatedUser, message: 'User details updated successfully.' }))
+})
+
 export {
   changeCurrentPassword,
   getCurrentUser,
@@ -303,5 +319,6 @@ export {
   resetPassword,
   sendPasswordRecoveryEmail,
   signUpUser,
+  updateAccountDetails,
   verifyUserEmail,
 }

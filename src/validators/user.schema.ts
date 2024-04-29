@@ -25,11 +25,14 @@ const baseUserSchema = z.object({
     }),
 })
 
-const extendedUserSchema = baseUserSchema.extend({
-  displayName: z.string().optional(),
-  avatar: z.string().or(z.string().url()).optional(),
-  coverImage: z.string().or(z.string().url()).optional(),
-})
+const extendedUserSchema = baseUserSchema
+  .extend({
+    displayName: z.string(),
+    bio: z.string(),
+    avatar: z.string().or(z.string().url()),
+    coverImage: z.string().or(z.string().url()),
+  })
+  .partial()
 
 const signUpUserSchema = baseUserSchema
 
@@ -46,10 +49,18 @@ const resetPasswordSchema = baseUserSchema.pick({ password: true }).extend({
   token: z.string().trim(),
 })
 
+const changePasswordSchema = z.object({
+  oldPassword: baseUserSchema.shape.password,
+  newPassword: baseUserSchema.shape.password,
+})
+
+const updateUserSchema = extendedUserSchema.omit({ password: true, email: true })
+
 export {
   baseUserSchema,
-  extendedUserSchema,
+  changePasswordSchema,
   loginUserSchema,
   resetPasswordSchema,
   signUpUserSchema,
+  updateUserSchema,
 }

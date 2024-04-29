@@ -11,15 +11,18 @@ import {
   resetPassword,
   sendPasswordRecoveryEmail,
   signUpUser,
+  updateAccountDetails,
   verifyUserEmail,
 } from '@/controllers/user.controller'
 import ENV from '@/env'
 import { passport, verifyJWT } from '@/middlewares/auth.middleware'
 import {
   isUserExist,
+  validateChangePasswordData,
   validateLoginUserData,
   validateResetPasswordData,
   validateSignUpUserData,
+  validateUpdateUserAccountData,
   validateUserEmail,
 } from '@/middlewares/user.middleware'
 
@@ -50,13 +53,16 @@ router.get(
   loginUserWithGoogleOrFacebook
 )
 
-router.get('/current-user', verifyJWT, getCurrentUser)
-router.post('/verify-email', verifyJWT, verifyUserEmail)
-router.post('/resend-verification-email', validateUserEmail, resendVerificationEmail)
-router.post('/logout', verifyJWT, logoutUser)
 router.post('/refresh-token', refreshAccessToken)
-router.post('/change-password', verifyJWT, changeCurrentPassword)
 router.post('/password-recovery-email', validateUserEmail, sendPasswordRecoveryEmail)
 router.post('/reset-password', validateResetPasswordData, resetPassword)
+router.post('/resend-verification-email', validateUserEmail, resendVerificationEmail)
+
+// Protected Routes
+router.get('/current-user', verifyJWT, getCurrentUser)
+router.post('/verify-email', verifyJWT, verifyUserEmail)
+router.post('/logout', verifyJWT, logoutUser)
+router.post('/change-password', verifyJWT, validateChangePasswordData, changeCurrentPassword)
+router.patch('/update-account', verifyJWT, validateUpdateUserAccountData, updateAccountDetails)
 
 export default router

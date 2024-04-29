@@ -6,9 +6,11 @@ import { asyncHandler } from '@/utils/asyncHandler'
 import { ApiError } from '@/utils/errorHandling/ApiError'
 import {
   baseUserSchema,
+  changePasswordSchema,
   loginUserSchema,
   resetPasswordSchema,
   signUpUserSchema,
+  updateUserSchema,
 } from '@/validators/user.schema'
 
 const isUserExist = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
@@ -109,11 +111,50 @@ const validateResetPasswordData = asyncHandler(
   }
 )
 
+const validateChangePasswordData = asyncHandler(
+  async (req: Request, _res: Response, next: NextFunction) => {
+    const { oldPassword, newPassword } = req.body
+
+    const payload = changePasswordSchema.safeParse({
+      oldPassword,
+      newPassword,
+    })
+
+    if (!payload?.success) {
+      const errorMessage = fromZodError(payload?.error)?.message
+      throw ApiError.Api400Error({ message: errorMessage })
+    }
+
+    req.body = payload?.data
+
+    next()
+  }
+)
+
+const validateUpdateUserAccountData = asyncHandler(
+  (req: Request, _res: Response, next: NextFunction) => {
+    const body = req.body
+
+    const payload = updateUserSchema.safeParse(body)
+
+    if (!payload?.success) {
+      const errorMessage = fromZodError(payload?.error)?.message
+      throw ApiError.Api400Error({ message: errorMessage })
+    }
+
+    req.body = payload?.data
+
+    next()
+  }
+)
+
 export {
   isUserEmailVerified,
   isUserExist,
+  validateChangePasswordData,
   validateLoginUserData,
   validateResetPasswordData,
   validateSignUpUserData,
+  validateUpdateUserAccountData,
   validateUserEmail,
 }
