@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import {
   changeCurrentPassword,
+  getAllUsers,
   getCurrentUser,
   loginUser,
   loginUserWithGoogleOrFacebook,
@@ -24,10 +25,12 @@ import {
   validateSignUpUserData,
   validateUpdateUserAccountData,
   validateUserEmail,
+  validateUserId,
 } from '@/middlewares/user.middleware'
 
 const router = Router()
 
+// Public Routes
 router.post('/signup', validateSignUpUserData, isUserExist, signUpUser)
 router.post('/login', validateLoginUserData, loginUser)
 
@@ -57,6 +60,7 @@ router.post('/refresh-token', refreshAccessToken)
 router.post('/password-recovery-email', validateUserEmail, sendPasswordRecoveryEmail)
 router.post('/reset-password', validateResetPasswordData, resetPassword)
 router.post('/resend-verification-email', validateUserEmail, resendVerificationEmail)
+router.get('/all-users', validateUserId, getAllUsers)
 
 // Protected Routes
 router.get('/current-user', verifyJWT, getCurrentUser)

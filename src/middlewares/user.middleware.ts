@@ -4,6 +4,7 @@ import { fromZodError } from 'zod-validation-error'
 import { prisma } from '@/db/prisma'
 import { asyncHandler } from '@/utils/asyncHandler'
 import { ApiError } from '@/utils/errorHandling/ApiError'
+import { idSchema } from '@/validators/common.schema'
 import {
   baseUserSchema,
   changePasswordSchema,
@@ -91,6 +92,21 @@ const validateUserEmail = asyncHandler(async (req: Request, _res: Response, next
   next()
 })
 
+const validateUserId = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
+  const { currentUserId } = req.query
+
+  const payload = idSchema.optional().safeParse(currentUserId)
+
+  if (!payload?.success) {
+    const errorMessage = fromZodError(payload?.error)?.message
+    throw ApiError.Api400Error({ message: errorMessage })
+  }
+
+  req.query = { ...req.query, currentUserId: payload?.data }
+
+  next()
+})
+
 const validateResetPasswordData = asyncHandler(
   async (req: Request, _res: Response, next: NextFunction) => {
     const { token, password } = req.body
@@ -157,4 +173,5 @@ export {
   validateSignUpUserData,
   validateUpdateUserAccountData,
   validateUserEmail,
+  validateUserId,
 }

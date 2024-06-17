@@ -16,6 +16,7 @@ import {
 import { ApiResponse } from '@/utils/ApiResponse'
 import { asyncHandler } from '@/utils/asyncHandler'
 import { ApiError } from '@/utils/errorHandling/ApiError'
+import { excludeKeys } from '@/utils/utilityFunctions/excludeKeys'
 
 const signUpUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, email, password } = req.body
@@ -55,7 +56,7 @@ const verifyUserEmail = asyncHandler(async (req: Request, res: Response) => {
     data: { isEmailVerified: true },
   })
 
-  const { password: _password, refreshToken: _refreshToken, ...registeredUser } = updatedUser
+  const registeredUser = excludeKeys(updatedUser, ['password', 'refreshToken'])
 
   return res.status(HttpStatusCodes.OK).json(
     new ApiResponse({
@@ -118,7 +119,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user?.id)
 
-  const { password: _password, refreshToken: _refreshToken, ...loggedInUser } = user
+  const loggedInUser = excludeKeys(user, ['password', 'refreshToken'])
 
   return res.status(HttpStatusCodes.OK).json(
     new ApiResponse({
@@ -244,6 +245,30 @@ const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
   )
 })
 
+const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+  const { currentUserId } = req.query || {}
+
+  const data = await prisma.user.findMany({
+    where: {
+      NOT: {
+        id: String(currentUserId || ''),
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  const users = data.map((user) => excludeKeys(user, ['password', 'refreshToken']))
+
+  return res.status(HttpStatusCodes.OK).json(
+    new ApiResponse({
+      message: 'All users fetched successfully.',
+      data: users,
+    })
+  )
+})
+
 const sendPasswordRecoveryEmail = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.body || {}
 
@@ -301,7 +326,7 @@ const updateAccountDetails = asyncHandler(async (req: Request, res: Response) =>
     data: body,
   })
 
-  const { password: _password, refreshToken: _refreshToken, ...updatedUser } = user
+  const updatedUser = excludeKeys(user, ['password', 'refreshToken'])
 
   return res
     .status(HttpStatusCodes.OK)
@@ -310,6 +335,7 @@ const updateAccountDetails = asyncHandler(async (req: Request, res: Response) =>
 
 export {
   changeCurrentPassword,
+  getAllUsers,
   getCurrentUser,
   loginUser,
   loginUserWithGoogleOrFacebook,
