@@ -5,6 +5,7 @@ import express, { Express } from 'express'
 import ENV from '@/env'
 import { passport } from '@/middlewares/auth.middleware'
 import { errorHandler } from '@/middlewares/errorHandler.middleware'
+import followRouter from '@/routes/follow.routes'
 import uploadRouter from '@/routes/upload.routes'
 import userRouter from '@/routes/user.routes'
 
@@ -20,6 +21,7 @@ app.use(passport.initialize())
 // routes declarations
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/uploads', uploadRouter)
+app.use('/api/v1/follows', followRouter)
 
 // global error handler
 app.use(errorHandler)

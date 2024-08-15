@@ -15,7 +15,8 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(uuid())
+  id String @id @default(uuid())
+
   username        String         @unique
   email           String         @unique
   displayName     String?
@@ -28,8 +29,33 @@ model User {
   facebookId      String?        @unique
   authProviders   AuthProvider[]
   isEmailVerified Boolean        @default(false)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+
+  following  Follow[] @relation("Following")
+  followedBy Follow[] @relation("FollowedBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Follow {
+  id String @id @default(uuid())
+
+  // The user who is following another user
+  follower   User   @relation(name: "Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId String
+
+  // The user who is being followed
+  following   User   @relation(name: "FollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Ensure that a user cannot follow the same user more than once
+  @@unique([followerId, followingId])
+  // Indexes to speed up queries involving followerId and followingId
+  @@index([followerId])
+  @@index([followingId])
 }
 
 enum AuthProvider {
