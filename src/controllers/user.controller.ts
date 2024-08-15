@@ -245,14 +245,56 @@ const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
   )
 })
 
-const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+const getUserByUsernameOrId = asyncHandler(async (req: Request, res: Response) => {
+  const { username, userId } = req.params
+
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        {
+          username: username,
+        },
+        {
+          id: userId,
+        },
+      ],
+    },
+  })
+
+  if (!user) {
+    throw ApiError.Api404Error({
+      message: 'User with the provided username or userId does not exist.',
+    })
+  }
+
+  const sanitizedUser = excludeKeys(user, ['password', 'refreshToken'])
+
+  return res
+    .status(HttpStatusCodes.OK)
+    .json(new ApiResponse({ data: sanitizedUser, message: 'User fetched successfully.' }))
+})
+
+const getRecommendUsers = asyncHandler(async (req: Request, res: Response) => {
   const { currentUserId } = req.query || {}
 
   const data = await prisma.user.findMany({
     where: {
-      NOT: {
-        id: String(currentUserId || ''),
-      },
+      AND: [
+        {
+          NOT: {
+            id: String(currentUserId || ''),
+          },
+        },
+        {
+          NOT: {
+            followedBy: {
+              some: {
+                followerId: String(currentUserId || ''),
+              },
+            },
+          },
+        },
+      ],
     },
     orderBy: {
       createdAt: 'desc',
@@ -335,8 +377,9 @@ const updateAccountDetails = asyncHandler(async (req: Request, res: Response) =>
 
 export {
   changeCurrentPassword,
-  getAllUsers,
   getCurrentUser,
+  getRecommendUsers,
+  getUserByUsernameOrId,
   loginUser,
   loginUserWithGoogleOrFacebook,
   logoutUser,

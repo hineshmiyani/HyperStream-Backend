@@ -93,16 +93,48 @@ const validateUserEmail = asyncHandler(async (req: Request, _res: Response, next
 })
 
 const validateUserId = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
-  const { currentUserId } = req.query
+  const { userId } = req.params
 
-  const payload = idSchema.optional().safeParse(currentUserId)
+  const payload = idSchema.safeParse(userId)
 
   if (!payload?.success) {
     const errorMessage = fromZodError(payload?.error)?.message
     throw ApiError.Api400Error({ message: errorMessage })
   }
 
-  req.query = { ...req.query, currentUserId: payload?.data }
+  req.params = { ...req.params, userId: payload?.data }
+
+  next()
+})
+
+const validateOptionalUserId = asyncHandler(
+  async (req: Request, _res: Response, next: NextFunction) => {
+    const { currentUserId } = req.query
+
+    const payload = idSchema.optional().safeParse(currentUserId)
+
+    if (!payload?.success) {
+      const errorMessage = fromZodError(payload?.error)?.message
+      throw ApiError.Api400Error({ message: errorMessage })
+    }
+
+    req.query = { ...req.query, currentUserId: payload?.data }
+
+    next()
+  }
+)
+
+const validateUsername = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
+  const { username } = req.params
+
+  const payload = baseUserSchema.shape.username.safeParse(username)
+
+  if (!payload?.success) {
+    const errorMessage = fromZodError(payload?.error)?.message
+    throw ApiError.Api400Error({ message: errorMessage })
+  }
+
+  req.params = { ...req.params, username: payload?.data }
 
   next()
 })
@@ -169,9 +201,11 @@ export {
   isUserExist,
   validateChangePasswordData,
   validateLoginUserData,
+  validateOptionalUserId,
   validateResetPasswordData,
   validateSignUpUserData,
   validateUpdateUserAccountData,
   validateUserEmail,
   validateUserId,
+  validateUsername,
 }

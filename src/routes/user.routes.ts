@@ -2,8 +2,9 @@ import { Router } from 'express'
 
 import {
   changeCurrentPassword,
-  getAllUsers,
   getCurrentUser,
+  getRecommendUsers,
+  getUserByUsernameOrId,
   loginUser,
   loginUserWithGoogleOrFacebook,
   logoutUser,
@@ -21,11 +22,13 @@ import {
   isUserExist,
   validateChangePasswordData,
   validateLoginUserData,
+  validateOptionalUserId,
   validateResetPasswordData,
   validateSignUpUserData,
   validateUpdateUserAccountData,
   validateUserEmail,
   validateUserId,
+  validateUsername,
 } from '@/middlewares/user.middleware'
 
 const router = Router()
@@ -60,7 +63,9 @@ router.post('/refresh-token', refreshAccessToken)
 router.post('/password-recovery-email', validateUserEmail, sendPasswordRecoveryEmail)
 router.post('/reset-password', validateResetPasswordData, resetPassword)
 router.post('/resend-verification-email', validateUserEmail, resendVerificationEmail)
-router.get('/all-users', validateUserId, getAllUsers)
+router.get('/recommend-users', validateOptionalUserId, getRecommendUsers)
+router.get('/u/username/:username', validateUsername, getUserByUsernameOrId)
+router.get('/u/id/:userId', validateUserId, getUserByUsernameOrId)
 
 // Protected Routes
 router.get('/current-user', verifyJWT, getCurrentUser)
