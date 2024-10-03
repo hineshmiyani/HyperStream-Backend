@@ -107,6 +107,11 @@ passport.use(
               email,
               avatar,
               authProviders: [AuthProvider.GOOGLE],
+              stream: {
+                create: {
+                  name: `${username}'s stream`,
+                },
+              },
             },
           })
         }
@@ -163,6 +168,11 @@ passport.use(
               email,
               avatar,
               authProviders: [AuthProvider.FACEBOOK],
+              stream: {
+                create: {
+                  name: `${username}'s stream`,
+                },
+              },
             },
           })
         }

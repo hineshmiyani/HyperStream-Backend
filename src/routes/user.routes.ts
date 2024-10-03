@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
   changeCurrentPassword,
   getCurrentUser,
+  getCurrentUserByUsername,
   getRecommendUsers,
   getUserByUsernameOrId,
   loginUser,
@@ -69,6 +70,7 @@ router.get('/u/id/:userId', validateUserId, getUserByUsernameOrId)
 
 // Protected Routes
 router.get('/current-user', verifyJWT, getCurrentUser)
+router.get('/current-user/:username', verifyJWT, validateUsername, getCurrentUserByUsername)
 router.post('/verify-email', verifyJWT, verifyUserEmail)
 router.post('/logout', verifyJWT, logoutUser)
 router.post('/change-password', verifyJWT, validateChangePasswordData, changeCurrentPassword)

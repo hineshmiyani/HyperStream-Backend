@@ -19,33 +19,47 @@ import { ApiError } from '@/utils/errorHandling/ApiError'
 import { excludeKeys } from '@/utils/utilityFunctions/excludeKeys'
 
 const signUpUser = asyncHandler(async (req: Request, res: Response) => {
-  const { username, email, password } = req.body
+  try {
+    const { username, email, password } = req.body
 
-  const hashedPassword = await generateHashedPassword(password)
+    const hashedPassword = await generateHashedPassword(password)
 
-  const user = await prisma.user.create({
-    data: {
-      username,
-      email,
-      password: hashedPassword,
-      authProviders: [AuthProvider.JWT],
-    },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-    },
-  })
-
-  await sendVerificationEmail(user?.id, user?.email)
-
-  return res.status(HttpStatusCodes.CREATED).json(
-    new ApiResponse({
-      statusCode: HttpStatusCodes.CREATED,
-      data: user,
-      message: 'Verification email sent successfully.',
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        authProviders: [AuthProvider.JWT],
+        stream: {
+          create: {
+            name: `${username}'s stream`,
+          },
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
     })
-  )
+
+    await sendVerificationEmail(user?.id, user?.email)
+
+    return res.status(HttpStatusCodes.CREATED).json(
+      new ApiResponse({
+        statusCode: HttpStatusCodes.CREATED,
+        data: user,
+        message: 'Verification email sent successfully.',
+      })
+    )
+  } catch (error) {
+    await prisma.user.delete({
+      where: {
+        email: req.body?.email,
+      },
+    })
+    throw ApiError.Api500Error()
+  }
 })
 
 const verifyUserEmail = asyncHandler(async (req: Request, res: Response) => {
@@ -67,27 +81,31 @@ const verifyUserEmail = asyncHandler(async (req: Request, res: Response) => {
 })
 
 const resendVerificationEmail = asyncHandler(async (req: Request, res: Response) => {
-  const { email } = req.body
+  try {
+    const { email } = req.body
 
-  const user = await prisma.user.findFirst({
-    where: { email },
-  })
-
-  if (!user) {
-    throw ApiError.Api404Error({ message: 'User with the provided email does not exist.' })
-  }
-
-  if (user?.isEmailVerified) {
-    throw ApiError.Api400Error({ message: 'Email already verified.' })
-  }
-
-  await sendVerificationEmail(user?.id, user?.email)
-
-  return res.status(HttpStatusCodes.OK).json(
-    new ApiResponse({
-      message: 'Verification email sent successfully.',
+    const user = await prisma.user.findFirst({
+      where: { email },
     })
-  )
+
+    if (!user) {
+      throw ApiError.Api404Error({ message: 'User with the provided email does not exist.' })
+    }
+
+    if (user?.isEmailVerified) {
+      throw ApiError.Api400Error({ message: 'Email already verified.' })
+    }
+
+    await sendVerificationEmail(user?.id, user?.email)
+
+    return res.status(HttpStatusCodes.OK).json(
+      new ApiResponse({
+        message: 'Verification email sent successfully.',
+      })
+    )
+  } catch (error) {
+    throw ApiError.Api500Error()
+  }
 })
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
@@ -245,6 +263,34 @@ const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
   )
 })
 
+const getCurrentUserByUsername = asyncHandler(async (req: Request, res: Response) => {
+  const { username } = req.params
+
+  const userId = (req.user as User)?.id
+
+  const currentUser = await prisma.user.findFirst({
+    where: {
+      username: username,
+    },
+  })
+
+  if (!currentUser) {
+    throw ApiError.Api404Error({
+      message: 'User with the provided username does not exist.',
+    })
+  }
+
+  if (currentUser?.id !== userId) {
+    throw ApiError.Api401Error({ message: 'Unauthorized request!' })
+  }
+
+  const sanitizedUser = excludeKeys(currentUser, ['password', 'refreshToken'])
+
+  return res
+    .status(HttpStatusCodes.OK)
+    .json(new ApiResponse({ data: sanitizedUser, message: 'User fetched successfully.' }))
+})
+
 const getUserByUsernameOrId = asyncHandler(async (req: Request, res: Response) => {
   const { username, userId } = req.params
 
@@ -290,6 +336,15 @@ const getRecommendUsers = asyncHandler(async (req: Request, res: Response) => {
             followedBy: {
               some: {
                 followerId: String(currentUserId || ''),
+              },
+            },
+          },
+        },
+        {
+          NOT: {
+            blocking: {
+              some: {
+                blockedId: String(currentUserId || ''),
               },
             },
           },
@@ -378,6 +433,7 @@ const updateAccountDetails = asyncHandler(async (req: Request, res: Response) =>
 export {
   changeCurrentPassword,
   getCurrentUser,
+  getCurrentUserByUsername,
   getRecommendUsers,
   getUserByUsernameOrId,
   loginUser,
