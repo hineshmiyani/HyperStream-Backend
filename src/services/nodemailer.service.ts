@@ -1,12 +1,12 @@
 import nodemailer from 'nodemailer'
 
 import ENV from '@/env'
+import { ApiError } from '@/utils/errorHandling/ApiError'
 
 const transporter = nodemailer.createTransport({
   host: ENV.NODEMAILER_HOST, // SMTP server
   port: Number(ENV.NODEMAILER_PORT),
-  secure: false, // Use TLS for secure connections
-  requireTLS: true,
+  secure: true, // Use TLS for secure connections
   auth: {
     user: ENV.NODEMAILER_USER_EMAIL, // your email
     pass: ENV.NODEMAILER_USER_PASSWORD, // your email account password
@@ -37,6 +37,7 @@ const sendEmail = async ({
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error sending email:', error)
+    throw ApiError.Api500Error()
   }
 }
 

@@ -95,17 +95,21 @@ const verifyToken = async (token: string): Promise<string | jwt.JwtPayload> => {
 }
 
 const sendVerificationEmail = async (userId: string, userEmail: string): Promise<void> => {
-  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(userId)
+  try {
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(userId)
 
-  const verificationURL = new URL(`${ENV.FRONTEND_BASE_URL}/verify-email`)
-  verificationURL.searchParams.set('accessToken', accessToken)
-  verificationURL.searchParams.set('refreshToken', refreshToken)
+    const verificationURL = new URL(`${ENV.FRONTEND_BASE_URL}/verify-email`)
+    verificationURL.searchParams.set('accessToken', accessToken)
+    verificationURL.searchParams.set('refreshToken', refreshToken)
 
-  await sendEmail({
-    to: userEmail,
-    subject: 'Welcome to HyperStream',
-    html: generateVerificationEmail(verificationURL?.toString()),
-  })
+    await sendEmail({
+      to: userEmail,
+      subject: 'Welcome to HyperStream',
+      html: generateVerificationEmail(verificationURL?.toString()),
+    })
+  } catch (error) {
+    throw ApiError.Api500Error()
+  }
 }
 
 const sendResetPasswordEmail = async (user: User): Promise<void> => {
