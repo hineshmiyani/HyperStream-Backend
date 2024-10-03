@@ -5,7 +5,9 @@ import express, { Express } from 'express'
 import ENV from '@/env'
 import { passport } from '@/middlewares/auth.middleware'
 import { errorHandler } from '@/middlewares/errorHandler.middleware'
+import blockRouter from '@/routes/block.routes'
 import followRouter from '@/routes/follow.routes'
+import streamRouter from '@/routes/stream.routes'
 import uploadRouter from '@/routes/upload.routes'
 import userRouter from '@/routes/user.routes'
 
@@ -22,6 +24,8 @@ app.use(passport.initialize())
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/uploads', uploadRouter)
 app.use('/api/v1/follows', followRouter)
+app.use('/api/v1/blocks', blockRouter)
+app.use('/api/v1/streams', streamRouter)
 
 // global error handler
 app.use(errorHandler)
