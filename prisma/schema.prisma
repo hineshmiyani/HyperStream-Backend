@@ -4,58 +4,102 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
-// prisma/schema.prisma
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id String @id @default(uuid())
+  id              String         @id @default(uuid()) // The unique identifier for each user, generated as a UUID by default
+  username        String         @unique // The username of the user, which must be unique
+  email           String         @unique // The email address of the user, which must be unique
+  displayName     String? // The display name of the user, which is optional
+  password        String? // The password of the user, which is optional
+  bio             String?        @db.Text // A short biography of the user, stored as text in the database, which is optional
+  avatar          String?        @db.Text // The URL or path to the user's avatar image, stored as text in the database, which is optional
+  coverImage      String?        @db.Text // The URL or path to the user's cover image, stored as text in the database, which is optional
+  refreshToken    String?        @db.Text // The refresh token for the user's session, stored as text in the database, which is optional
+  googleId        String?        @unique // The Google ID of the user, which must be unique
+  facebookId      String?        @unique // The Facebook ID of the user, which must be unique
+  authProviders   AuthProvider[] // A list of authentication providers associated with the user
+  isEmailVerified Boolean        @default(false) // A boolean indicating whether the user's email has been verified, defaulting to false
 
-  username        String         @unique
-  email           String         @unique
-  displayName     String?
-  password        String?
-  bio             String?        @db.Text
-  avatar          String?        @db.Text
-  coverImage      String?        @db.Text
-  refreshToken    String?        @db.Text
-  googleId        String?        @unique
-  facebookId      String?        @unique
-  authProviders   AuthProvider[]
-  isEmailVerified Boolean        @default(false)
+  following  Follow[] @relation("Following") // A list of users that this user is following, establishing a many-to-many relationship
+  followedBy Follow[] @relation("FollowedBy") // A list of users that are following this user, establishing a many-to-many relationship
 
-  following  Follow[] @relation("Following")
-  followedBy Follow[] @relation("FollowedBy")
+  blocking  Block[] @relation("Blocking") // A list of users that this user has blocked, establishing a many-to-many relationship
+  blockedBy Block[] @relation("BlockedBy") // A list of users that have blocked this user, establishing a many-to-many relationship
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  stream Stream? // An optional field `Stream` of type `Stream` in the model.
+
+  createdAt DateTime @default(now()) // The timestamp when the user was created, defaulting to the current time
+  updatedAt DateTime @updatedAt // The timestamp when the user was last updated, automatically set to the current time on update
 }
 
 model Follow {
-  id String @id @default(uuid())
+  id String @id @default(uuid()) // Unique identifier for each follow relationship, automatically generated using UUID
 
-  // The user who is following another user
-  follower   User   @relation(name: "Following", fields: [followerId], references: [id], onDelete: Cascade)
-  followerId String
+  follower   User   @relation(name: "Following", fields: [followerId], references: [id], onDelete: Cascade) // The user who is following another user
+  followerId String // Foreign key referencing the ID of the follower user
 
-  // The user who is being followed
-  following   User   @relation(name: "FollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
-  followingId String
+  following   User   @relation(name: "FollowedBy", fields: [followingId], references: [id], onDelete: Cascade) // The user who is being followed
+  followingId String // Foreign key referencing the ID of the user being followed
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // Timestamp indicating when the follow relationship was created, defaults to the current time
+  updatedAt DateTime @updatedAt // Timestamp automatically updated to the current time whenever the follow relationship is modified
 
-  // Ensure that a user cannot follow the same user more than once
-  @@unique([followerId, followingId])
-  // Indexes to speed up queries involving followerId and followingId
-  @@index([followerId])
-  @@index([followingId])
+  @@unique([followerId, followingId]) // Composite unique constraint to prevent duplicate follow relationships between the same users
+  @@index([followerId]) // Index on followerId to optimize query performance for operations involving the follower
+  @@index([followingId]) // Index on followingId to optimize query performance for operations involving the followed user
+}
+
+model Block {
+  id String @id @default(uuid()) // The unique identifier for each Block record, generated as a UUID by default
+
+  // Defines a relation to the User model for the blocker, with a named relation "Blocking"
+  // The relation is established using the blockerId field, and references the id field in the User model
+  // If the referenced User is deleted, the corresponding Block record will also be deleted (Cascade)
+  blocker   User   @relation(name: "Blocking", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockerId String // Foreign key referencing the User who is blocking another user
+
+  // Defines a relation to the User model for the blocked user, with a named relation "BlockedBy"
+  // The relation is established using the blockedId field, and references the id field in the User model
+  // If the referenced User is deleted, the corresponding Block record will also be deleted (Cascade)
+  blocked   User   @relation(name: "BlockedBy", fields: [blockedId], references: [id], onDelete: Cascade)
+  blockedId String // Foreign key referencing the User who is being blocked
+
+  @@unique([blockerId, blockedId]) // Ensures that the combination of blockerId and blockedId is unique across the Block table
+  @@index([blockerId]) // Index on blockerId to speed up queries
+  @@index([blockedId]) // Index on blockedId to speed up queries
+}
+
+model Stream {
+  id           String  @id @default(uuid()) // Primary key with a default value generated using UUID for uniqueness
+  name         String  @db.Text // Name of the stream, stored as a text type in the database
+  thumbnailUrl String? @db.Text // Optional URL for the stream's thumbnail image, stored as a text type
+
+  ingressId String? @unique // Optional unique identifier for the stream's ingress, ensuring no duplicates
+  serverUrl String? @db.Text // Optional URL of the server where the stream is hosted, stored as a text type
+  streamKey String? @db.Text // Optional key required to access the stream, stored as a text type
+
+  isLive              Boolean @default(false) // Boolean flag indicating if the stream is currently live, defaults to false
+  isChatEnabled       Boolean @default(true) // Boolean flag indicating if chat is enabled for the stream, defaults to true
+  isChatDelayed       Boolean @default(false) // Boolean flag indicating if chat messages are delayed, defaults to false
+  isChatFollowersOnly Boolean @default(false) // Boolean flag indicating if only followers can chat, defaults to false
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the User model, with cascading delete
+  userId String @unique // Unique identifier for the user associated with the stream
+
+  createdAt DateTime @default(now()) // Timestamp for when the stream was created, defaults to the current time
+  updatedAt DateTime @updatedAt // Timestamp for when the stream was last updated, automatically updated
+
+  @@index([userId]) // Index on the userId field to optimize queries filtering by user
+  @@index([ingressId]) // Index on the ingressId field to optimize queries filtering by ingressId
 }
 
 enum AuthProvider {
