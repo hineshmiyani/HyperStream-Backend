@@ -16,6 +16,7 @@ import {
 const router = Router()
 
 router.get('/is-following/:followingId', validateFollowUserData, isUserAlreadyFollowing)
+
 router.post('/follow', verifyJWT, validateFollowUserData, validateIsUserNotFollowing, followUser)
 router.post('/unfollow', verifyJWT, validateFollowUserData, validateIsUserFollowing, unfollowUser)
 

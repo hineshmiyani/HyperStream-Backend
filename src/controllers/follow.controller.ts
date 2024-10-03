@@ -6,6 +6,7 @@ import { prisma } from '@/db/prisma'
 import { getIsUserAlreadyFollowing } from '@/middlewares/follow.middleware'
 import { ApiResponse } from '@/utils/ApiResponse'
 import { asyncHandler } from '@/utils/asyncHandler'
+import { ApiError } from '@/utils/errorHandling/ApiError'
 import { excludeKeys } from '@/utils/utilityFunctions/excludeKeys'
 
 const isUserAlreadyFollowing = asyncHandler(async (req: Request, res: Response) => {
@@ -38,6 +39,10 @@ const followUser = asyncHandler(async (req: Request, res: Response) => {
     },
   })
 
+  if (!followedUser) {
+    throw ApiError.Api500Error({ message: 'Something went wrong!' })
+  }
+
   const sanitizeFollowedUser = {
     ...followedUser,
     following: excludeKeys(followedUser?.following, ['password', 'refreshToken']),
@@ -69,6 +74,10 @@ const unfollowUser = asyncHandler(async (req: Request, res: Response) => {
     },
   })
 
+  if (!unfollowedUser) {
+    throw ApiError.Api500Error({ message: 'Something went wrong!' })
+  }
+
   const sanitizeUnfollowedUser = {
     ...unfollowedUser,
     following: excludeKeys(unfollowedUser?.following, ['password', 'refreshToken']),
@@ -77,7 +86,7 @@ const unfollowUser = asyncHandler(async (req: Request, res: Response) => {
   return res.status(HttpStatusCodes.OK).json(
     new ApiResponse({
       data: sanitizeUnfollowedUser,
-      message: `You have unfollowed ${unfollowedUser?.following?.username}.`,
+      message: `You have unfollowed ${sanitizeUnfollowedUser?.following?.username}.`,
     })
   )
 })
@@ -88,11 +97,22 @@ const getFollowedUsers = asyncHandler(async (req: Request, res: Response) => {
   const followedUsers = await prisma.follow.findMany({
     where: {
       followerId: userId,
+      following: {
+        blocking: {
+          none: {
+            blockedId: userId,
+          },
+        },
+      },
     },
     include: {
       following: true,
     },
   })
+
+  if (!followedUsers) {
+    throw ApiError.Api500Error({ message: 'Something went wrong!' })
+  }
 
   const sanitizedFollowedUsers = followedUsers.map((followedUser) => {
     return {
