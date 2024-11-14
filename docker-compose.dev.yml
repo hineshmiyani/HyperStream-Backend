@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: api_server
+    build:
+      context: ./backend_server
+      target: development
+    volumes:
+      - ./backend_server:/app
+      - /app/node_modules
+    ports:
+      - 8000:8000
+    env_file:
+      - ./backend_server/.env
+    command: yarn run dev
+
+  nginx:
+    image: nginx-i
+    container_name: ${NGINX_HOST}
+    build:
+      context: ./rtmp_server
+      dockerfile: Dockerfile
+      args:
+        ENABLED_MODULES: rtmp
+    env_file:
+      - ./.env
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+      - ${RTMP_PORT}:${RTMP_PORT}
+    volumes:
+      - ./rtmp_server/nginx.conf:/etc/nginx/nginx.conf
+      - ./rtmp_server/rtmp.conf:/etc/nginx/templates/rtmp.conf.template
+      - ./rtmp_server/http.conf:/etc/nginx/templates/http.conf.template
+      - ./rtmp_server/index.html:/www/index.html
+      - ./rtmp_server/tmp/hls:/tmp/hls

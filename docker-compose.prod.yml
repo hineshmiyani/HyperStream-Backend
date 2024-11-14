@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: ./backend_server
+      target: production
+    container_name: api_server
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend_server/.env
+
+  nginx:
+    image: nginx-i
+    container_name: ${NGINX_HOST}
+    build:
+      context: ./rtmp_server
+      dockerfile: Dockerfile
+      args:
+        ENABLED_MODULES: rtmp
+    env_file:
+      - ./.env
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+      - ${RTMP_PORT}:${RTMP_PORT}
+    volumes:
+      - ./rtmp_server/nginx.conf:/etc/nginx/nginx.conf
+      - ./rtmp_server/rtmp.conf:/etc/nginx/templates/rtmp.conf.template
+      - ./rtmp_server/http.conf:/etc/nginx/templates/http.conf.template
+      - ./rtmp_server/index.html:/www/index.html
+      - ./rtmp_server/tmp/hls:/tmp/hls

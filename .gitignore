@@ -118,8 +118,9 @@ dist
 .pnp.*
 
 # vscode
-.vscode
+# .vscode
 
 # extra
 todos.md
 .DS_Store
+tmp
