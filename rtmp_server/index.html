@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Streaming</title>
+    <link href="https://vjs.zencdn.net/8.16.1/video-js.css" rel="stylesheet" />
+  </head>
+  </head>
+  <body>
+    <video id="player" class="video-js vjs-default-skin" height="720" width="1280" controls>
+      <source src="http://localhost:8080/hls/hinesh.m3u8" type="application/x-mpegURL" />
+    </video>
+  <script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
+  <script>
+    videojs('#player');
+  </script>
+  </body>
+</html>
