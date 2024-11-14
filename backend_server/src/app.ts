@@ -7,6 +7,7 @@ import { passport } from '@/middlewares/auth.middleware'
 import { errorHandler } from '@/middlewares/errorHandler.middleware'
 import blockRouter from '@/routes/block.routes'
 import followRouter from '@/routes/follow.routes'
+import healthRouter from '@/routes/health.routes'
 import streamRouter from '@/routes/stream.routes'
 import uploadRouter from '@/routes/upload.routes'
 import userRouter from '@/routes/user.routes'
@@ -26,6 +27,9 @@ app.use('/api/v1/uploads', uploadRouter)
 app.use('/api/v1/follows', followRouter)
 app.use('/api/v1/blocks', blockRouter)
 app.use('/api/v1/streams', streamRouter)
+
+// Health check route
+app.use('/api/v1/health', healthRouter)
 
 // global error handler
 app.use(errorHandler)
