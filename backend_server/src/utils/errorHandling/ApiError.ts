@@ -31,6 +31,20 @@ class ApiError {
     })
   }
 
+  static Api403Error({
+    name = ErrorName.FORBIDDEN,
+    statusCode = HttpStatusCodes.FORBIDDEN,
+    message = 'Access to this resource is forbidden.',
+    isOperationalError = true,
+  } = {}): BaseError {
+    return new BaseError({
+      name,
+      statusCode,
+      message,
+      isOperationalError,
+    })
+  }
+
   static Api404Error({
     name = ErrorName.NOT_FOUND,
     statusCode = HttpStatusCodes.NOT_FOUND,

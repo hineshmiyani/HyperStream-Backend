@@ -1,0 +1,12 @@
+node_modules
+dist
+
+*.log
+.env
+.DS_Store
+.git
+
+Dockerfile
+docker-compose.yml
+
+todos.md

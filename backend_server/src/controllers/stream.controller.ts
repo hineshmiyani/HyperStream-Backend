@@ -62,4 +62,17 @@ const updateStream = asyncHandler(async (req: Request, res: Response) => {
     .json(new ApiResponse({ data: updatedStream, message: 'Stream updated successfully.' }))
 })
 
-export { getStreamByUserId, updateStream }
+const verifyStreamSecret = asyncHandler(async (req: Request, res: Response) => {
+  const streamKey = req.body.key
+
+  if (streamKey === 'supersecret') {
+    return res.status(HttpStatusCodes.OK).json(new ApiResponse({ message: 'Stream key is valid.' }))
+  } else {
+    res.status(HttpStatusCodes.FORBIDDEN).json('stream key is invalid')
+    return ApiError.Api403Error({
+      message: 'Stream key is invalid.',
+    })
+  }
+})
+
+export { getStreamByUserId, updateStream, verifyStreamSecret }

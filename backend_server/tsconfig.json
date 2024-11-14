@@ -5,7 +5,7 @@
     "module": "commonjs", // Set the module system (Node.js uses CommonJS)
     "strict": true, // Enable all strict type-checking options
     "outDir": "dist", // Redirect output structure to the 'dist' folder
-    "rootDir": ".", // Specify the root directory of source files
+    "rootDir": "./src", // Specify the root directory of source files
     "skipLibCheck": true, // Skip type checking of all declaration files (*.d.ts)
     "esModuleInterop": true, // Enables compatibility with default imports from modules
     "moduleResolution": "node", // Choose a module resolution strategy
@@ -15,7 +15,6 @@
     "paths": {
       "@/*": ["src/*"] // absolute paths
     },
-
     "strictNullChecks": true, // Enable strict null checks
     "strictFunctionTypes": true, // Enable strict checking of function types
     "strictPropertyInitialization": true, // Ensure non-undefined class properties are initialized in the constructor
@@ -36,6 +35,7 @@
   ],
   "exclude": [
     "node_modules", // Exclude the node_modules directory
+    "dist",
     "**/*.spec.ts",
     "**/*.test.ts" // Exclude test files
   ]

@@ -4,14 +4,17 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register -r dotenv/config ./src/index.ts",
     "dev": "nodemon",
-    "build": "tsc",
+    "build": "rimraf ./dist && tsc",
+    "start": "node -r module-alias/register -r dotenv/config dist/index.js",
     "format:check": "prettier --ignore-path .gitignore --check \"src/**/*.{js,mjs,cjs,ts,json}\"",
     "format:write": "prettier --ignore-path .gitignore --write \"src/**/*.{js,mjs,cjs,ts,json}\"",
     "lint:check": "eslint --ignore-path .gitignore \"src/**/*.{js,mjs,cjs,ts,json}\"",
     "lint:fix": "eslint --ignore-path .gitignore --fix \"src/**/*.{js,mjs,cjs,ts,json}\"",
     "prepare": "husky"
+  },
+  "_moduleAliases": {
+    "@": "dist"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +28,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "multer": "^1.4.5-lts.1",
     "multer-s3": "^3.0.1",
     "nodemailer": "^6.9.13",
@@ -61,6 +65,7 @@
     "nodemon": "^3.1.0",
     "prettier": "^3.2.5",
     "prisma": "^5.19.1",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.3"
