@@ -351,6 +351,14 @@ const getRecommendUsers = asyncHandler(async (req: Request, res: Response) => {
         },
       ],
     },
+    include: {
+      stream: {
+        select: {
+          id: true,
+          isLive: true,
+        },
+      },
+    },
     orderBy: {
       createdAt: 'desc',
     },

@@ -22,4 +22,6 @@ const updateStreamSchema = streamSchema.pick({
   isChatFollowersOnly: true,
 })
 
-export { streamSchema, updateStreamSchema }
+const verifyStreamKeySchema = streamSchema.pick({ name: true, streamKey: true })
+
+export { streamSchema, updateStreamSchema, verifyStreamKeySchema }

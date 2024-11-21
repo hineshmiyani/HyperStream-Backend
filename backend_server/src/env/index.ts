@@ -34,6 +34,9 @@ const ENV = {
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || '',
   AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME || '',
   AWS_REGION: process.env.AWS_REGION || '',
+
+  // RTMP SERVER
+  RTMP_SERVER_URL: process.env.RTMP_SERVER_URL || '',
 }
 
 export default ENV

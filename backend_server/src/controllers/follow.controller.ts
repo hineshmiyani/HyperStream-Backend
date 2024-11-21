@@ -106,7 +106,16 @@ const getFollowedUsers = asyncHandler(async (req: Request, res: Response) => {
       },
     },
     include: {
-      following: true,
+      following: {
+        include: {
+          stream: {
+            select: {
+              id: true,
+              isLive: true,
+            },
+          },
+        },
+      },
     },
   })
 

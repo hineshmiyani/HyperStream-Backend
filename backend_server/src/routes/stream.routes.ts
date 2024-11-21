@@ -1,12 +1,18 @@
 import { Router } from 'express'
 
 import {
+  generateStreamConnection,
   getStreamByUserId,
+  onStreamEnd,
+  onStreamStart,
   updateStream,
-  verifyStreamSecret,
 } from '@/controllers/stream.controller'
 import { verifyJWT } from '@/middlewares/auth.middleware'
-import { validateUpdateStreamData } from '@/middlewares/stream.middleware'
+import {
+  validateStreamEndData,
+  validateStreamStartData,
+  validateUpdateStreamData,
+} from '@/middlewares/stream.middleware'
 import { validateUserId } from '@/middlewares/user.middleware'
 
 const router = Router()
@@ -15,6 +21,10 @@ router.get('/u/:userId', validateUserId, getStreamByUserId)
 
 router.put('/update-stream', verifyJWT, validateUpdateStreamData, updateStream)
 
-router.post('/auth', verifyStreamSecret)
+router.put('/generate-stream-connection', verifyJWT, generateStreamConnection)
+
+router.post('/start', validateStreamStartData, onStreamStart)
+
+router.post('/end', validateStreamEndData, onStreamEnd)
 
 export default router
